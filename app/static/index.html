@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulk Certificate Generator - Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-icon">📜</div>
+        <div>
+          <h1>Bulk Certificate Generator</h1>
+          <span class="badge-subtitle">Async Worker Engine • PDF Vector Render</span>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="/docs" target="_blank" class="nav-btn secondary">Swagger OpenAPI Docs</a>
+        <button id="nav-btn-new" class="nav-btn primary" onclick="startNewJob()">+ New Bulk Job</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('tab-generate')" id="tab-btn-generate">
+        🚀 Generate Certificates
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-history')" id="tab-btn-history">
+        📋 Job History & Tracker
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-verify')" id="tab-btn-verify">
+        🛡️ Verify Certificate
+      </button>
+    </div>
+
+    <!-- TAB 1: BULK GENERATOR -->
+    <section id="tab-generate" class="tab-content active">
+      <div class="grid-2col">
+        <!-- Form Panel -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Job Configuration</h2>
+            <p>Define the certificate template content and recipients.</p>
+          </div>
+          
+          <form id="job-form" onsubmit="handleJobSubmit(event)">
+            <div class="form-group">
+              <label for="job-title">Certificate Title / Event Name <span class="required">*</span></label>
+              <input type="text" id="job-title" required placeholder="e.g. Full-Stack Engineering Masterclass" value="Full-Stack Engineering Masterclass">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="issuer-name">Issuing Organization <span class="required">*</span></label>
+                <input type="text" id="issuer-name" required placeholder="e.g. Aereo Institute of Tech" value="Aereo Institute of Technology">
+              </div>
+              <div class="form-group">
+                <label for="issue-date">Issue Date</label>
+                <input type="text" id="issue-date" placeholder="e.g. October 6, 2026" value="October 6, 2026">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="job-desc">Achievement Description</label>
+              <textarea id="job-desc" rows="2" placeholder="Brief description of the accomplishment">In recognition of demonstrated excellence, active participation, and mastery of core concepts.</textarea>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row">
+                <label for="recipients-json">Recipients List (JSON format) <span class="required">*</span></label>
+                <div class="template-actions">
+                  <button type="button" class="btn-text" onclick="loadSampleData(false)">Load Sample (5 Valid)</button>
+                  <button type="button" class="btn-text warning" onclick="loadSampleData(true)">Load Sample (With 1 Invalid)</button>
+                </div>
+              </div>
+              <textarea id="recipients-json" rows="9" class="code-font" required></textarea>
+              <span class="field-hint">Format: Array of objects with <code>name</code> and <code>email</code>.</span>
+            </div>
+
+            <button type="submit" id="btn-submit-job" class="btn btn-submit">
+              <span>Generate Certificates</span>
+              <span class="btn-icon">⚡</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Live Job Monitor Panel -->
+        <div class="card" id="monitor-panel">
+          <div class="card-header flex-between">
+            <div>
+              <h2>Current Job Progress</h2>
+              <p>Real-time background generation tracker</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <button type="button" class="table-btn" onclick="startNewJob()" title="Start a new job" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--primary-gold); color: var(--primary-gold);">+ New Job</button>
+              <div id="active-job-badge" class="badge badge-idle">Ready to Run</div>
+            </div>
+          </div>
+
+          <div id="monitor-placeholder" class="empty-state">
+            <div class="empty-icon">⏳</div>
+            <h3>No Active Job</h3>
+            <p>Submit a certificate job on the left or click "Load Sample" to begin background generation.</p>
+          </div>
+
+          <div id="monitor-active" style="display: none;">
+            <div class="job-meta-box">
+              <div class="meta-row">
+                <span class="meta-label">Job ID:</span>
+                <span id="active-job-id" class="meta-val code-font">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Title:</span>
+                <span id="active-job-title" class="meta-val">-</span>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-section">
+              <div class="progress-labels">
+                <span id="progress-percent-label">0% Complete</span>
+                <span id="progress-counts-label">0 / 0 processed</span>
+              </div>
+              <div class="progress-track">
+                <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Stats Metrics -->
+            <div class="metrics-grid">
+              <div class="metric-card total">
+                <div class="metric-num" id="stat-total">0</div>
+                <div class="metric-label">Total</div>
+              </div>
+              <div class="metric-card success">
+                <div class="metric-num" id="stat-success">0</div>
+                <div class="metric-label">Success</div>
+              </div>
+              <div class="metric-card failed">
+                <div class="metric-num" id="stat-failed">0</div>
+                <div class="metric-label">Failed</div>
+              </div>
+            </div>
+
+            <!-- Bulk Download Action -->
+            <div class="zip-action-row" id="zip-action-container" style="display: none;">
+              <a id="btn-download-zip" href="#" target="_blank" class="btn btn-zip">
+                📦 Download All as ZIP Archive
+              </a>
+            </div>
+
+            <!-- Certificate Table List -->
+            <div class="table-container">
+              <table class="cert-table">
+                <thead>
+                  <tr>
+                    <th>Recipient</th>
+                    <th>Status</th>
+                    <th>Certificate ID</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="cert-table-body">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: JOB HISTORY -->
+    <section id="tab-history" class="tab-content">
+      <div class="card">
+        <div class="card-header flex-between">
+          <div>
+            <h2>Generation Job History</h2>
+            <p>List of all previous certificate generation jobs and their completion rates.</p>
+          </div>
+          <button class="btn btn-secondary" onclick="loadJobHistory()">🔄 Refresh</button>
+        </div>
+        <div class="table-container">
+          <table class="cert-table">
+            <thead>
+              <tr>
+                <th>Created</th>
+                <th>Job ID</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Success</th>
+                <th>Failed</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <tr><td colspan="8" class="text-center">Loading jobs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: VERIFY CERTIFICATE -->
+    <section id="tab-verify" class="tab-content">
+      <div class="card max-w-md">
+        <div class="card-header">
+          <h2>Certificate Verification</h2>
+          <p>Verify certificate authenticity using the unique Certificate ID.</p>
+        </div>
+        <form onsubmit="handleVerifySubmit(event)">
+          <div class="form-group">
+            <label for="verify-code">Certificate ID Code</label>
+            <input type="text" id="verify-code" class="code-font" placeholder="e.g. CERT-B38E8DA8FC" required>
+          </div>
+          <button type="submit" class="btn btn-submit">Verify Authenticity 🔍</button>
+        </form>
+
+        <div id="verify-result" style="display: none; margin-top: 1.5rem;">
+          <!-- Verification details injected here -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- PDF Preview Modal -->
+  <div id="pdf-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Certificate Preview</h3>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="pdf-frame" src="" frameborder="0"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
