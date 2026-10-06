@@ -327,3 +327,29 @@ curl -X GET "http://localhost:8000/api/v1/certificates/verify/CERT-8D1F20AB43"
 | All recipients valid | Asynchronously generates all PDFs | `COMPLETED` (`success_count == total_count`) |
 | 1 or more recipients have invalid emails or rendering faults | Faulty item flagged `FAILED` with explicit error message; remaining valid items generated successfully | `PARTIAL_SUCCESS` (`success_count > 0`, `failed_count > 0`) |
 | All items failed | All items flagged `FAILED` | `FAILED` (`success_count == 0`) |
+
+---
+
+## ☁️ Deploying to Render
+
+This repository is pre-configured for **Render** via [render.yaml](file:///c:/Users/tshas/Aereo_assignment/render.yaml), [Procfile](file:///c:/Users/tshas/Aereo_assignment/Procfile), and [.python-version](file:///c:/Users/tshas/Aereo_assignment/.python-version).
+
+### Option 1: Automatic Blueprint Deployment (Recommended)
+1. Go to [dashboard.render.com](https://dashboard.render.com).
+2. Click **New +** $\rightarrow$ **Blueprint**.
+3. Select this repository: `shashwat0010/Aereo_bulk_certificate_generator`.
+4. Render automatically reads `render.yaml` and sets up the build and start commands.
+5. Click **Apply**.
+
+### Option 2: Manual Web Service Setup
+1. Go to [dashboard.render.com](https://dashboard.render.com).
+2. Click **New +** $\rightarrow$ **Web Service**.
+3. Connect your GitHub repository: `shashwat0010/Aereo_bulk_certificate_generator`.
+4. Fill in the settings:
+   - **Name**: `aereo-bulk-certificate-generator`
+   - **Language / Runtime**: `Python`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - **Health Check Path**: `/health`
+5. Click **Deploy Web Service**.
+
