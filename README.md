@@ -1,5 +1,13 @@
 # Bulk Certificate Generator API & Service
 
+[![Render Deployment](https://img.shields.io/badge/Render-Live%20Demo-brightgreen?logo=render&style=for-the-badge)](https://aereo-bulk-certificate-generator.onrender.com/)
+[![OpenAPI Docs](https://img.shields.io/badge/Swagger-OpenAPI%20Docs-blue?logo=fastapi&style=for-the-badge)](https://aereo-bulk-certificate-generator.onrender.com/docs)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-yellow?logo=python&style=for-the-badge)](https://www.python.org/)
+
+> 🚀 **Live Production Deployment**: [https://aereo-bulk-certificate-generator.onrender.com/](https://aereo-bulk-certificate-generator.onrender.com/)  
+> 📖 **Live Interactive API Docs (Swagger)**: [https://aereo-bulk-certificate-generator.onrender.com/docs](https://aereo-bulk-certificate-generator.onrender.com/docs)  
+> 🩺 **Live Health Check**: [https://aereo-bulk-certificate-generator.onrender.com/health](https://aereo-bulk-certificate-generator.onrender.com/health)
+
 A robust, production-grade backend API built with **FastAPI**, **SQLAlchemy**, and **ReportLab** that accepts high-volume certificate generation requests, processes them asynchronously, tracks real-time generation progress, provides resilient partial-failure isolation, and enables instant single or bulk ZIP downloads.
 
 Includes an interactive **Web Dashboard**, comprehensive **Pytest test suite**, and an **Autonomous QA Agent** for end-to-end sanity and stress testing.
@@ -117,10 +125,11 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 The server starts at `http://127.0.0.1:8000`.
 
 ### Access Interfaces
-- **Interactive Web Dashboard**: [http://localhost:8000/](http://localhost:8000/)
-- **Swagger / OpenAPI Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **ReDoc Interactive Reference**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
-- **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
+- **Live Cloud Dashboard**: [https://aereo-bulk-certificate-generator.onrender.com/](https://aereo-bulk-certificate-generator.onrender.com/)
+- **Live Swagger OpenAPI Docs**: [https://aereo-bulk-certificate-generator.onrender.com/docs](https://aereo-bulk-certificate-generator.onrender.com/docs)
+- **Local Dashboard**: [http://localhost:8000/](http://localhost:8000/)
+- **Local Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Health Check**: [https://aereo-bulk-certificate-generator.onrender.com/health](https://aereo-bulk-certificate-generator.onrender.com/health)
 
 ---
 
